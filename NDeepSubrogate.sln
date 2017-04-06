@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NDeepSubrogate.Spring.Tests
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NDeepSubrogate.Core.Tests", "NDeepSubrogate.Core.Tests\NDeepSubrogate.Core.Tests.csproj", "{27BAC56F-9756-4B11-990D-94A177336501}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NDeepSubrogate.Spring", "NDeepSubrogate.Spring\NDeepSubrogate.Spring.csproj", "{1F48F27D-C502-43BE-885E-EFF0863BE086}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{27BAC56F-9756-4B11-990D-94A177336501}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{27BAC56F-9756-4B11-990D-94A177336501}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{27BAC56F-9756-4B11-990D-94A177336501}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F48F27D-C502-43BE-885E-EFF0863BE086}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F48F27D-C502-43BE-885E-EFF0863BE086}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F48F27D-C502-43BE-885E-EFF0863BE086}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F48F27D-C502-43BE-885E-EFF0863BE086}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
