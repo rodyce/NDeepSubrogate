@@ -18,8 +18,7 @@
 
 #endregion
 
-
-using System;
+ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -27,22 +26,17 @@ using NDeepSubrogate.Core.Attributes;
 
 namespace NDeepSubrogate.Core
 {
-    public class DeepSurrogateScope
+    public abstract class DeepSurrogateScope
     {
         private readonly object _initialObject;
         private readonly IDictionary<Type, ISet<FieldInfo>> _fieldsToRestoreDictionary;
-        private readonly Func<Type, object> _getObjectFromTypeFunc;
-        private readonly Func<Type, object> _getSurrogateFromTypeFunc;
         private readonly ISet<object> _processedObjects;
 
-        public DeepSurrogateScope(object initialObject,
-            Func<Type, object> getObjectFromTypeFunc, Func<Type, object> getSurrogateFromTypeFunc)
+        protected DeepSurrogateScope(object initialObject)
         {
             _initialObject = initialObject;
             _fieldsToRestoreDictionary = new Dictionary<Type, ISet<FieldInfo>>();
             _processedObjects = new HashSet<object>();
-            _getObjectFromTypeFunc = getObjectFromTypeFunc;
-            _getSurrogateFromTypeFunc = getSurrogateFromTypeFunc;
             TypesToSubrogateSet = DetermineTypesToSubrogate();
         }
 
@@ -55,7 +49,8 @@ namespace NDeepSubrogate.Core
 
         private void DeepSubrogateReferences(object currentObject)
         {
-            if (_processedObjects.Contains(currentObject))
+            if (currentObject == null ||_processedObjects.Contains(currentObject) ||
+                !IsSubrogationEnabledForType(currentObject.GetType()))
             {
                 return;
             }
@@ -69,15 +64,14 @@ namespace NDeepSubrogate.Core
                     //Register the current field and its owner type to be restored
                     RegisterFieldToRestore(workingType, field);
 
-                    var replacementObject = _getSurrogateFromTypeFunc(field.FieldType);
+                    var surrogateObject = GetSurrogateFromType(field.FieldType);
 
-                    //TODO: Determine if replacement object needs to be explored for mocking
-
-                    field.SetValue(currentObject, replacementObject);
+                    field.SetValue(currentObject, surrogateObject);
                 }
                 else if (IsFieldToBeExplored(field))
                 {
-                    
+                    var obj = GetObjectFromField(field, currentObject);
+                    DeepSubrogateReferences(obj);
                 }
             }
         }
@@ -86,11 +80,11 @@ namespace NDeepSubrogate.Core
         {
             ForEachFieldToRestore((type, fieldInfo) =>
             {
-                var instance = type == _initialObject.GetType() ? _initialObject : _getObjectFromTypeFunc(type);
+                var instance = type == _initialObject.GetType() ? _initialObject : GetObjectFromType(type);
 
                 if (instance != null)
                 {
-                    fieldInfo.SetValue(instance, _getObjectFromTypeFunc(fieldInfo.FieldType));
+                    fieldInfo.SetValue(instance, GetObjectFromType(fieldInfo.FieldType));
                 }
             });
         }
@@ -139,23 +133,40 @@ namespace NDeepSubrogate.Core
             }
         }
 
+        private static bool IsSubrogationEnabledForType(Type someType)
+        {
+            var attr = someType.GetCustomAttribute<DeepSubrogateAttribute>();
+            return attr == null || attr.Enabled;
+        }
+
         protected ISet<Type> DetermineTypesToSubrogate()
         {
             var typesToSubrogate = new HashSet<Type>();
             var workingType = _initialObject.GetType();
+            if (!IsSubrogationEnabledForType(workingType))
+            {
+                return typesToSubrogate;
+            }
+
             var fieldSet = GetAllFieldsFromType(workingType);
             foreach (var field in fieldSet)
             {
-                foreach (var customAttributeData in field.CustomAttributes)
+                if (field.GetCustomAttribute<SubrogateAttribute>() != null)
                 {
-                    if (customAttributeData.AttributeType == typeof(SubrogateAttribute))
-                    {
-                        typesToSubrogate.Add(field.FieldType);
-                    }
+                    typesToSubrogate.Add(field.FieldType);
                 }
             }
 
             return typesToSubrogate;
+        }
+
+        protected abstract object GetObjectFromType(Type type);
+
+        protected abstract object GetSurrogateFromType(Type type);
+
+        protected virtual object GetObjectFromField(FieldInfo fieldInfo, object o)
+        {
+            return fieldInfo.GetValue(o);
         }
     }
 }

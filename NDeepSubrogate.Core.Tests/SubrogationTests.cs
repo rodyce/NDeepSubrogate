@@ -35,7 +35,7 @@ namespace NDeepSubrogate.Core.Tests
     {
 
         [Test]
-        public void DetermineTypesToSubrogateTest()
+        public void DetermineTypesToSubrogateTestA()
         {
             //Since only the _calculator field, of type ICalculator, has the Subrogate attribute then
             //only the type ICalculator must be subrogated.
@@ -43,9 +43,54 @@ namespace NDeepSubrogate.Core.Tests
             var dummy = new DummyOneSurrogate();
 
             Func<Type, object> dummyFunc = type => null;
-            var surrogateScope = new DeepSurrogateScope(dummy, dummyFunc, dummyFunc);
+            var surrogateScope = new TestableDeepSurrogateScope(dummy, dummyFunc, dummyFunc);
 
             var expectedSet = new HashSet<Type>() { typeof(ICalculator) };
+            Assert.AreEqual(expectedSet, surrogateScope.TypesToSubrogateSet);
+        }
+
+        [Test]
+        public void DetermineTypesToSubrogateTestB()
+        {
+            //Since only the _calculator field, of type ICalculator, has the Subrogate attribute then
+            //only the type ICalculator must be subrogated.
+
+            var dummy = new DummyTwoSurrogates();
+
+            Func<Type, object> dummyFunc = type => null;
+            var surrogateScope = new TestableDeepSurrogateScope(dummy, dummyFunc, dummyFunc);
+
+            var expectedSet = new HashSet<Type>() { typeof(ICalculator), typeof(Vehicle) };
+            Assert.AreEqual(expectedSet, surrogateScope.TypesToSubrogateSet);
+        }
+
+        [Test]
+        public void NoSurrogateTest()
+        {
+            //Since only the _calculator field, of type ICalculator, has the Subrogate attribute then
+            //only the type ICalculator must be subrogated.
+
+            var dummy = new DummyNoSurrogateA();
+
+            Func<Type, object> dummyFunc = type => null;
+            var surrogateScope = new TestableDeepSurrogateScope(dummy, dummyFunc, dummyFunc);
+
+            var expectedSet = new HashSet<Type>();
+            Assert.AreEqual(expectedSet, surrogateScope.TypesToSubrogateSet);
+        }
+
+        [Test]
+        public void SubrogationDisabledTest()
+        {
+            //Since only the _calculator field, of type ICalculator, has the Subrogate attribute then
+            //only the type ICalculator must be subrogated.
+
+            var dummy = new DummySubrogationDisabled();
+
+            Func<Type, object> dummyFunc = type => null;
+            var surrogateScope = new TestableDeepSurrogateScope(dummy, dummyFunc, dummyFunc);
+
+            var expectedSet = new HashSet<Type>();
             Assert.AreEqual(expectedSet, surrogateScope.TypesToSubrogateSet);
         }
 
@@ -56,6 +101,13 @@ namespace NDeepSubrogate.Core.Tests
             var calculatorSubstitute = Substitute.For<ICalculator>();
             var vehicleSubstitute = Substitute.For<Vehicle>();
 
+            IDictionary<Type, object> surrogateObjects = new Dictionary<Type, object>
+            {
+                {typeof(ICalculator), calculatorSubstitute},
+                {typeof(Vehicle), vehicleSubstitute}
+            };
+            Func<Type, object> surrogateObjectsFunc = type => surrogateObjects[type];
+
             IDictionary<Type, object> originalObjects = new Dictionary<Type, object>
             {
                 {typeof(ICalculator), dummy.Calculator},
@@ -63,22 +115,37 @@ namespace NDeepSubrogate.Core.Tests
             };
             Func<Type, object> originalObjectsFunc = type => originalObjects[type];
 
-            IDictionary<Type, object> replacementObjects = new Dictionary<Type, object>
-            {
-                {typeof(ICalculator), calculatorSubstitute},
-                {typeof(Vehicle), vehicleSubstitute}
-            };
-            Func<Type, object> replacementObjectsFunc = type => replacementObjects[type];
-
-            var surrogateScope = new DeepSurrogateScope(dummy, originalObjectsFunc, replacementObjectsFunc);
+            var surrogateScope = new TestableDeepSurrogateScope(dummy, surrogateObjectsFunc,
+                originalObjectsFunc);
 
             surrogateScope.DeepSubrogate();
-            Assert.AreSame(replacementObjects[typeof(ICalculator)], dummy.Calculator);
-            Assert.AreSame(replacementObjects[typeof(Vehicle)], dummy.Vehicle);
+            Assert.AreSame(surrogateObjects[typeof(ICalculator)], dummy.Calculator);
+            Assert.AreSame(surrogateObjects[typeof(Vehicle)], dummy.Vehicle);
 
             surrogateScope.DeepRestore();
             Assert.AreSame(originalObjects[typeof(ICalculator)], dummy.Calculator);
             Assert.AreSame(originalObjects[typeof(Vehicle)], dummy.Vehicle);
+        }
+
+        private class DummyNoSurrogateA
+        {
+            private readonly ICalculator _calculator = new Calculator();
+            private readonly Vehicle _vehicle = new Vehicle();
+
+            public ICalculator Calculator => _calculator;
+            public Vehicle Vehicle => _vehicle;
+        }
+
+        [DeepSubrogate(Enabled = false)]
+        private class DummySubrogationDisabled
+        {
+            [Subrogate]
+            private readonly ICalculator _calculator = new Calculator();
+            [Subrogate]
+            private readonly Vehicle _vehicle = new Vehicle();
+
+            public ICalculator Calculator => _calculator;
+            public Vehicle Vehicle => _vehicle;
         }
 
         [DeepSubrogate]
