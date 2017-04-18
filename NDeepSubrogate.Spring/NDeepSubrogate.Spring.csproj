@@ -67,7 +67,6 @@
     <Compile Include="SpringDeepSurrogateScope.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SurrogateFactoryObject.cs" />
-    <Compile Include="TestableDeepSurrogateScope.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

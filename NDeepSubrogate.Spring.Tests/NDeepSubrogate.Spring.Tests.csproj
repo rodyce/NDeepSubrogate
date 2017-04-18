@@ -7,8 +7,8 @@
     <ProjectGuid>{CF691FDD-4B34-4D2C-9791-093601145E28}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ContextualMocks.Tests</RootNamespace>
-    <AssemblyName>ContextualMocks.Tests</AssemblyName>
+    <RootNamespace>NDeepSubrogate.Spring.Tests</RootNamespace>
+    <AssemblyName>NDeepSubrogate.Spring.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -72,15 +72,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DummyServices\ConcreteClassService.cs" />
     <Compile Include="NormalInjectionTest.cs" />
-    <Compile Include="DummyServices\IDummyServiceC.cs" />
-    <Compile Include="DummyServices\IDummyServiceA.cs" />
-    <Compile Include="DummyServices\IDummyServiceB.cs" />
-    <Compile Include="DummyServices\Impl\DummyServiceC.cs" />
-    <Compile Include="DummyServices\Impl\DummyServiceB.cs" />
-    <Compile Include="DummyServices\Impl\DummyServiceA.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ServiceImpl\SpringCalculator.cs" />
+    <Compile Include="ServiceImpl\SpringVehicle.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -93,9 +88,17 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\NDeepSubrogate.Core.Tests\NDeepSubrogate.Core.Tests.csproj">
+      <Project>{27bac56f-9756-4b11-990d-94a177336501}</Project>
+      <Name>NDeepSubrogate.Core.Tests</Name>
+    </ProjectReference>
     <ProjectReference Include="..\NDeepSubrogate.Core\NDeepSubrogate.Core.csproj">
-      <Project>{14604B7F-1BC3-4245-BBE8-E298E057356C}</Project>
+      <Project>{14604b7f-1bc3-4245-bbe8-e298e057356c}</Project>
       <Name>NDeepSubrogate.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NDeepSubrogate.Spring\NDeepSubrogate.Spring.csproj">
+      <Project>{1f48f27d-c502-43be-885e-eff0863be086}</Project>
+      <Name>NDeepSubrogate.Spring</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

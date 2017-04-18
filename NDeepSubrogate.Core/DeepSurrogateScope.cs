@@ -42,7 +42,7 @@ namespace NDeepSubrogate.Core
 
         public ISet<Type> TypesToSubrogateSet { get; }
 
-        public void DeepSubrogate()
+        public virtual void DeepSubrogate()
         {
             DeepSubrogateReferences(_initialObject);
         }
@@ -76,7 +76,7 @@ namespace NDeepSubrogate.Core
             }
         }
 
-        public void DeepRestore()
+        public virtual void DeepRestore()
         {
             ForEachFieldToRestore((type, fieldInfo) =>
             {
@@ -103,12 +103,12 @@ namespace NDeepSubrogate.Core
             return allFields;
         }
 
-        protected bool IsFieldToBeSubstituted(FieldInfo field)
+        protected virtual bool IsFieldToBeSubstituted(FieldInfo field)
         {
             return TypesToSubrogateSet.Contains(field.FieldType);
         }
 
-        protected bool IsFieldToBeExplored(FieldInfo field)
+        protected virtual bool IsFieldToBeExplored(FieldInfo field)
         {
             return !IsFieldToBeSubstituted(field);
         }
