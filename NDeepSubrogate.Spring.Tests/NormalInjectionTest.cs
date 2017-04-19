@@ -48,18 +48,30 @@ namespace NDeepSubrogate.Spring.Tests
 
         [Subrogate]
         [Autowired]
-        private readonly ICalculator _dummyCalculator;
+        private readonly ICalculator _dummyCalculator = null;
+
+        [Autowired]
+        private readonly SpringVehicle _vehicle = null;
 
         [Test]
         public void ServicesAreInjected()
         {
             Assert.IsNotNull(_dummyCalculator);
+            Assert.IsNotNull(_vehicle);
         }
 
         [Test]
-        public void SubrogateRestoreTest()
+        public void BeforeSubrogateTest()
         {
-            
+            _vehicle.Accelerate(10);
+            _vehicle.Accelerate(30);
+
+            Assert.AreEqual(40, _vehicle.SpeedInKph);
+        }
+
+        [Test]
+        public void RestoreTest()
+        {
             var subrogateScope = new SpringDeepSurrogateScope(this,
                 (AbstractApplicationContext)applicationContext);
 
@@ -68,6 +80,28 @@ namespace NDeepSubrogate.Spring.Tests
             subrogateScope.DeepSubrogate();
 
             Assert.AreNotSame(oldCalculator, _dummyCalculator);
+
+            subrogateScope.DeepRestore();
+
+            Assert.AreSame(oldCalculator, _dummyCalculator);
         }
+
+        /*
+        [Test]
+        public void DeepSubrogateTest()
+        {
+            var subrogateScope = new SpringDeepSurrogateScope(this,
+                (AbstractApplicationContext)applicationContext);
+
+            subrogateScope.DeepSubrogate();
+
+            _dummyCalculator.Add(Arg.Any<double>(), Arg.Any<double>()).Returns(100.0);
+
+            _vehicle.Accelerate(10);
+            _vehicle.Accelerate(40);
+            Assert.AreEqual(100, _vehicle.SpeedInKph);
+
+            subrogateScope.DeepRestore();
+        }*/
     }
 }

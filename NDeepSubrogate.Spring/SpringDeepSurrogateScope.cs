@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using NDeepSubrogate.Core;
 using NDeepSubrogate.Core.Attributes;
 using Spring.Aop.Framework;
 using Spring.Context.Support;
+using Spring.Core.IO;
 using Spring.Objects.Factory.Attributes;
 using Spring.Objects.Factory.Config;
 using Spring.Objects.Factory.Support;
@@ -52,33 +54,44 @@ namespace NDeepSubrogate.Spring
                 return;
             }
 
+            var objectNameList = GetAppContextObjectNameListFromType(type);
+
             var objectDefinition = ObjectDefinitionBuilder.GenericObjectDefinition(
                 typeof(SurrogateFactoryObject))
                 .AddPropertyValue("ObjectType", type)
                 .ObjectDefinition;
-            var objectDefinitionName = type.FullName;
+            var objectDefinitionName = objectNameList.Count == 1 ? objectNameList.First() : type.FullName;
             if (_applicationContext.ContainsObjectDefinition(objectDefinitionName))
             {
                 //TODO: Save original object definition
                 _oldObjectDefinitionsDictionary[objectDefinitionName] =
                     _applicationContext.GetObjectDefinition(objectDefinitionName);
+                _applicationContext.CreateObject(objectDefinitionName, null, null);
             }
             else
             {
-                //TODO: Add the surrogate ObjectDefinition to be removed later
+                //Add the surrogate ObjectDefinition to be removed later
                 _objectDefsToRemoveSet.Add(objectDefinitionName);
+
+                //This version of Spring.NET does not support removing object definition from the ApplicationContext.
+                //Therefore, do not support this for now.
+                throw new NotSupportedException("Cannot register a surrogate ObjectDefinition since it cannot be " +
+                                                "removed");
             }
             _applicationContext.RegisterObjectDefinition(objectDefinitionName, objectDefinition);
+            _applicationContext.CreateObject(objectDefinitionName, null, null);
+            _applicationContext.GetObject(objectDefinitionName);
         }
 
         protected override object GetObjectFromType(Type type)
         {
-            return _applicationContext.GetObject(type.FullName);
+            var objectNameList = GetAppContextObjectNameListFromType(type);
+            return _applicationContext.GetObject(objectNameList.First());
         }
 
         protected override object GetSurrogateFromType(Type type)
         {
-            return _applicationContext.GetObject(type.FullName);
+            return GetObjectFromType(type);
         }
 
         protected override object GetObjectFromField(FieldInfo fieldInfo, object o)
@@ -113,6 +126,17 @@ namespace NDeepSubrogate.Spring
                 _applicationContext.RegisterObjectDefinition(objectDefinitionName,
                     _oldObjectDefinitionsDictionary[objectDefinitionName]);
             }
+        }
+
+        private IList<string> GetAppContextObjectNameListFromType(Type type)
+        {
+            var objectNameList = _applicationContext.GetObjectNamesForType(type);
+            if (objectNameList.Count > 1)
+            {
+                throw new NotSupportedException("The case where there is more than one object for a single type is " +
+                                                "not yet supported");
+            }
+            return objectNameList;
         }
     }
 }
