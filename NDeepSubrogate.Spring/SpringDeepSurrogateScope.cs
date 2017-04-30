@@ -79,6 +79,7 @@ namespace NDeepSubrogate.Spring
                                                 "removed");
             }
             _applicationContext.RegisterObjectDefinition(objectDefinitionName, objectDefinition);
+            //_applicationContext.Refresh();
             _applicationContext.CreateObject(objectDefinitionName, null, null);
             _applicationContext.GetObject(objectDefinitionName);
         }

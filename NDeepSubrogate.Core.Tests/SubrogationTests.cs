@@ -25,8 +25,8 @@ using NDeepSubrogate.Core.Attributes;
 using NDeepSubrogate.Core.Tests.SampleClasses;
 using NDeepSubrogate.Core.Tests.SampleInterfaces;
 using NDeepSubrogate.Core.Tests.SampleInterfaces.Impl;
-using NSubstitute;
 using NUnit.Framework;
+using FakeItEasy;
 
 namespace NDeepSubrogate.Core.Tests
 {
@@ -98,8 +98,8 @@ namespace NDeepSubrogate.Core.Tests
         public void SubrogateTest()
         {
             var dummy = new DummyTwoSurrogates();
-            var calculatorSubstitute = Substitute.For<ICalculator>();
-            var vehicleSubstitute = Substitute.For<Vehicle>();
+            var calculatorSubstitute = A.Fake<ICalculator>();
+            var vehicleSubstitute = A.Fake<Vehicle>();
 
             IDictionary<Type, object> surrogateObjects = new Dictionary<Type, object>
             {

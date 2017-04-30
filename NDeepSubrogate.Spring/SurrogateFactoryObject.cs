@@ -1,6 +1,5 @@
 ﻿using System;
-using NSubstitute;
-using NSubstitute.Core;
+using FakeItEasy.Sdk;
 using Spring.Objects.Factory;
 
 namespace NDeepSubrogate.Spring
@@ -9,14 +8,14 @@ namespace NDeepSubrogate.Spring
     {
         public object GetObject()
         {
-            var objectTypeArray = new[] {ObjectType};
-
-            return ObjectType.IsInterface
-                ? Substitute.For(objectTypeArray, null)
-                : SubstitutionContext.Current.SubstituteFactory.CreatePartial(objectTypeArray, null);
+            return ObjectToFake == null ?
+                Create.Fake(ObjectType) :
+                Create.Fake(ObjectType, x => x.Wrapping(ObjectToFake));
         }
 
         public Type ObjectType { get; set; } = typeof(object);
+
+        public object ObjectToFake { get; set; } = null;
 
         public bool IsSingleton { get; } = true;
     }

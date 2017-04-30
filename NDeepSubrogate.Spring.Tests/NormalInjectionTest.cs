@@ -19,17 +19,10 @@
 #endregion
 
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using NDeepSubrogate.Core.Attributes;
-using NSubstitute;
 using NUnit.Framework;
 using Spring.Objects.Factory.Attributes;
 using Spring.Testing.NUnit;
-using NDeepSubrogate.Core.Tests.SampleClasses;
 using NDeepSubrogate.Core.Tests.SampleInterfaces;
 using NDeepSubrogate.Spring.Tests.ServiceImpl;
 using Spring.Context.Support;
