@@ -19,19 +19,21 @@
 #endregion
 
 
-using NDeepSubrogate.Core.Tests.SampleClasses;
-using NDeepSubrogate.Core.Tests.SampleInterfaces;
-using Spring.Objects.Factory.Attributes;
-using Spring.Stereotype;
+using Spring.Objects.Factory;
+using Spring.Objects.Factory.Support;
 
-namespace NDeepSubrogate.Spring.Tests.ServiceImpl
+namespace NDeepSubrogate.Spring
 {
-    [Component]
-    public class SpringVehicle : Vehicle
+    class DeepSubrogateObjectFactory : DefaultListableObjectFactory
     {
-        [Autowired]
-        private readonly ICalculator _calculator = null;
+        public DeepSubrogateObjectFactory(bool caseSensitive, IObjectFactory parentFactory)
+            : base(caseSensitive, parentFactory)
+        {
+        }
 
-        protected override ICalculator Calculator => _calculator;
+        public new void RemoveSingleton(string name)
+        {
+            base.RemoveSingleton(name);
+        }
     }
 }

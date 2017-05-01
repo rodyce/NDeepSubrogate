@@ -18,48 +18,34 @@
 
 #endregion
 
-
-using NDeepSubrogate.Core.Attributes;
+ 
+ using NDeepSubrogate.Core.Attributes;
+using NDeepSubrogate.Spring.Tests.ServiceImpl;
 using NUnit.Framework;
+using Spring.Context.Support;
 using Spring.Objects.Factory.Attributes;
 using Spring.Testing.NUnit;
-using NDeepSubrogate.Core.Tests.SampleInterfaces;
-using NDeepSubrogate.Spring.Tests.ServiceImpl;
-using Spring.Context.Support;
 
 namespace NDeepSubrogate.Spring.Tests
 {
     [DeepSubrogate]
-    public class NormalInjectionTest : AbstractDependencyInjectionSpringContextTests
+    public class ConcreteClassSubrogationTests : AbstractDependencyInjectionSpringContextTests
     {
-        public NormalInjectionTest()
+        public ConcreteClassSubrogationTests()
         {
-            ConfigLocations = new[] {"context.xml"};
+            ConfigLocations = new[] { "context.xml" };
         }
 
         protected override string[] ConfigLocations { get; }
 
         [Subrogate]
         [Autowired]
-        private readonly ICalculator _dummyCalculator = null;
-
-        [Autowired]
         private readonly SpringVehicle _vehicle = null;
 
         [Test]
         public void ServicesAreInjected()
         {
-            Assert.IsNotNull(_dummyCalculator);
             Assert.IsNotNull(_vehicle);
-        }
-
-        [Test]
-        public void BeforeSubrogateTest()
-        {
-            _vehicle.Accelerate(10);
-            _vehicle.Accelerate(30);
-
-            Assert.AreEqual(40, _vehicle.SpeedInKph);
         }
 
         [Test]
@@ -68,33 +54,15 @@ namespace NDeepSubrogate.Spring.Tests
             var subrogateScope = new SpringDeepSurrogateScope(this,
                 (AbstractApplicationContext)applicationContext);
 
-            var oldCalculator = _dummyCalculator;
+            var oldVehicle = _vehicle;
 
             subrogateScope.DeepSubrogate();
 
-            Assert.AreNotSame(oldCalculator, _dummyCalculator);
+            Assert.AreNotSame(oldVehicle.GetType(), _vehicle.GetType());
 
             subrogateScope.DeepRestore();
 
-            Assert.AreSame(oldCalculator, _dummyCalculator);
+            Assert.AreSame(oldVehicle.GetType(), _vehicle.GetType());
         }
-
-        /*
-        [Test]
-        public void DeepSubrogateTest()
-        {
-            var subrogateScope = new SpringDeepSurrogateScope(this,
-                (AbstractApplicationContext)applicationContext);
-
-            subrogateScope.DeepSubrogate();
-
-            _dummyCalculator.Add(Arg.Any<double>(), Arg.Any<double>()).Returns(100.0);
-
-            _vehicle.Accelerate(10);
-            _vehicle.Accelerate(40);
-            Assert.AreEqual(100, _vehicle.SpeedInKph);
-
-            subrogateScope.DeepRestore();
-        }*/
     }
 }

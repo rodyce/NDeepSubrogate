@@ -1,4 +1,25 @@
-﻿using System;
+﻿#region License
+
+/*
+ * Copyright 2017 Rodimiro Cerrato Espinal.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#endregion
+
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -6,7 +27,6 @@ using NDeepSubrogate.Core;
 using NDeepSubrogate.Core.Attributes;
 using Spring.Aop.Framework;
 using Spring.Context.Support;
-using Spring.Core.IO;
 using Spring.Objects.Factory.Attributes;
 using Spring.Objects.Factory.Config;
 using Spring.Objects.Factory.Support;
@@ -16,15 +36,13 @@ namespace NDeepSubrogate.Spring
     public class SpringDeepSurrogateScope : DeepSurrogateScope
     {
         private readonly AbstractApplicationContext _applicationContext;
-        private readonly ISet<string> _objectDefsToRemoveSet;
-        private readonly IDictionary<string, IObjectDefinition> _oldObjectDefinitionsDictionary;
+        private readonly IDictionary<string, IObjectDefinition> _originalObjectDefinitionsDictionary;
 
         public SpringDeepSurrogateScope(object initialObject,
             AbstractApplicationContext applicationContext) : base(initialObject)
         {
             _applicationContext = applicationContext;
-            _objectDefsToRemoveSet = new HashSet<string>();
-            _oldObjectDefinitionsDictionary = new Dictionary<string, IObjectDefinition>();
+            _originalObjectDefinitionsDictionary = new Dictionary<string, IObjectDefinition>();
         }
 
         public override void DeepSubrogate()
@@ -58,30 +76,26 @@ namespace NDeepSubrogate.Spring
 
             var objectDefinition = ObjectDefinitionBuilder.GenericObjectDefinition(
                 typeof(SurrogateFactoryObject))
-                .AddPropertyValue("ObjectType", type)
+                .AddPropertyValue("TargetObjectType", type)
                 .ObjectDefinition;
-            var objectDefinitionName = objectNameList.Count == 1 ? objectNameList.First() : type.FullName;
+
+            var nameList = objectNameList as string[] ?? objectNameList.ToArray();
+            var objectDefinitionName = nameList.Count() == 1 ? nameList.First() : type.FullName;
             if (_applicationContext.ContainsObjectDefinition(objectDefinitionName))
             {
-                //TODO: Save original object definition
-                _oldObjectDefinitionsDictionary[objectDefinitionName] =
+                // Save the original object definition so it can be restored afterwards.
+                _originalObjectDefinitionsDictionary[objectDefinitionName] =
                     _applicationContext.GetObjectDefinition(objectDefinitionName);
-                _applicationContext.CreateObject(objectDefinitionName, null, null);
             }
             else
             {
-                //Add the surrogate ObjectDefinition to be removed later
-                _objectDefsToRemoveSet.Add(objectDefinitionName);
-
                 //This version of Spring.NET does not support removing object definition from the ApplicationContext.
                 //Therefore, do not support this for now.
+                //Once supported, add the surrogate ObjectDefinition to be removed later.
                 throw new NotSupportedException("Cannot register a surrogate ObjectDefinition since it cannot be " +
-                                                "removed");
+                                                "removed afterwards");
             }
-            _applicationContext.RegisterObjectDefinition(objectDefinitionName, objectDefinition);
-            //_applicationContext.Refresh();
-            _applicationContext.CreateObject(objectDefinitionName, null, null);
-            _applicationContext.GetObject(objectDefinitionName);
+            _applicationContext.ReplaceObjectDefinition(objectDefinitionName, objectDefinition);
         }
 
         protected override object GetObjectFromType(Type type)
@@ -122,14 +136,13 @@ namespace NDeepSubrogate.Spring
 
         private void RestoreAppContext()
         {
-            foreach (var objectDefinitionName in _objectDefsToRemoveSet)
+            foreach (var entry in _originalObjectDefinitionsDictionary)
             {
-                _applicationContext.RegisterObjectDefinition(objectDefinitionName,
-                    _oldObjectDefinitionsDictionary[objectDefinitionName]);
+                _applicationContext.ReplaceObjectDefinition(entry.Key, entry.Value);
             }
         }
 
-        private IList<string> GetAppContextObjectNameListFromType(Type type)
+        private IEnumerable<string> GetAppContextObjectNameListFromType(Type type)
         {
             var objectNameList = _applicationContext.GetObjectNamesForType(type);
             if (objectNameList.Count > 1)

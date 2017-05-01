@@ -38,26 +38,6 @@
       <HintPath>..\packages\Common.Logging.Core.3.0.0\lib\net40\Common.Logging.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="nunit.framework, Version=2.6.3.13283, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
-      <HintPath>..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Spring.Aop, Version=2.0.1.45000, Culture=neutral, PublicKeyToken=65e474d141e25e07, processorArchitecture=MSIL">
-      <HintPath>..\packages\Spring.Aop.2.0.1\lib\net45\Spring.Aop.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Spring.Core, Version=2.0.1.45000, Culture=neutral, PublicKeyToken=65e474d141e25e07, processorArchitecture=MSIL">
-      <HintPath>..\packages\Spring.Core.2.0.1\lib\net45\Spring.Core.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Spring.Data, Version=2.0.1.45000, Culture=neutral, PublicKeyToken=65e474d141e25e07, processorArchitecture=MSIL">
-      <HintPath>..\packages\Spring.Data.2.0.1\lib\net45\Spring.Data.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Spring.Testing.NUnit, Version=2.0.1.45000, Culture=neutral, PublicKeyToken=65e474d141e25e07, processorArchitecture=MSIL">
-      <HintPath>..\packages\Spring.Testing.NUnit.2.0.1\lib\net45\Spring.Testing.NUnit.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />

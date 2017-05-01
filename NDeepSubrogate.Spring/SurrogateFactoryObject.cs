@@ -1,22 +1,27 @@
 ﻿using System;
 using FakeItEasy.Sdk;
-using Spring.Objects.Factory;
+using Spring.Objects.Factory.Config;
 
 namespace NDeepSubrogate.Spring
 {
-    internal class SurrogateFactoryObject : IFactoryObject
+    internal class SurrogateFactoryObject : AbstractFactoryObject
     {
-        public object GetObject()
+        private Type _objectType;
+
+        public override Type ObjectType => _objectType;
+
+        public Type TargetObjectType
+        {
+            set { _objectType = value; }
+        }
+
+        public object ObjectToFake { get; set; } = null;
+
+        protected override object CreateInstance()
         {
             return ObjectToFake == null ?
                 Create.Fake(ObjectType) :
                 Create.Fake(ObjectType, x => x.Wrapping(ObjectToFake));
         }
-
-        public Type ObjectType { get; set; } = typeof(object);
-
-        public object ObjectToFake { get; set; } = null;
-
-        public bool IsSingleton { get; } = true;
     }
 }
