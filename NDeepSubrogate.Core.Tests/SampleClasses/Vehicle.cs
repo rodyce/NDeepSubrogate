@@ -45,6 +45,11 @@ namespace NDeepSubrogate.Core.Tests.SampleClasses
             return (int)Calculator.Divide(distanceInKm, SpeedInKph/60.0);
         }
 
+        public void Stop()
+        {
+            SpeedInKph = 0;
+        }
+
         public ConsoleColor Color { get; set; }
 
         public int SpeedInKph { get; private set; }

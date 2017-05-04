@@ -18,7 +18,7 @@
 
 #endregion
 
-
+using FakeItEasy;
 using NDeepSubrogate.Core.Attributes;
 using NUnit.Framework;
 using Spring.Objects.Factory.Attributes;
@@ -62,7 +62,7 @@ namespace NDeepSubrogate.Spring.Tests
             Assert.AreEqual(40, _vehicle.SpeedInKph);
         }
 
-        //[Test]
+        [Test]
         public void RestoreTest()
         {
             var subrogateScope = new SpringDeepSurrogateScope(this,
@@ -79,22 +79,44 @@ namespace NDeepSubrogate.Spring.Tests
             Assert.AreSame(oldCalculator.GetType(), _dummyCalculator.GetType());
         }
 
-        /*
         [Test]
         public void DeepSubrogateTest()
         {
             var subrogateScope = new SpringDeepSurrogateScope(this,
                 (AbstractApplicationContext)applicationContext);
 
+            // Subrogate the referenced objects as marked with the [Subrogate] annotation.
             subrogateScope.DeepSubrogate();
 
-            _dummyCalculator.Add(Arg.Any<double>(), Arg.Any<double>()).Returns(100.0);
+            // Now that the original objects have been subrogates with fakes / mocks,
+            // configure those. In this case, configure the Add method of ICalculator
+            // to always return 100, no matter the arguments.
+            A.CallTo(() => _dummyCalculator.Add(A<double>._, A<double>._)).Returns(100.0);
 
+            // Make sure vehicle's speed is 0.0 Km/h (stopped)
+            _vehicle.Stop();
+            Assert.AreEqual(0, _vehicle.SpeedInKph);
+
+            // Accelerate the vehicle by 10 and then 40 Km/h.
             _vehicle.Accelerate(10);
             _vehicle.Accelerate(40);
+            // Expected result here is 100.0, instead of 50.0. This is because every time we add
+            // two doubles, the result is always 100.0, as configured before.
             Assert.AreEqual(100, _vehicle.SpeedInKph);
 
+            // Restore the original objects that were subrogated earlier.
             subrogateScope.DeepRestore();
-        }*/
+
+            // Make sure vehicle's speed is 0.0 Km/h (stopped)
+            _vehicle.Stop();
+            Assert.AreEqual(0, _vehicle.SpeedInKph);
+
+            // Accelerate the vehicle by 10 and then 40 Km/h.
+            _vehicle.Accelerate(10);
+            _vehicle.Accelerate(40);
+            // Expected result here is 50.0 This is because the original ICalculator object has been
+            // restored and does the correct math.
+            Assert.AreEqual(50, _vehicle.SpeedInKph);
+        }
     }
 }
