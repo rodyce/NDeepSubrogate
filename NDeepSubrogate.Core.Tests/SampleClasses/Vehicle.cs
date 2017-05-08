@@ -19,20 +19,18 @@
 #endregion
 
 
-using System;
 using NDeepSubrogate.Core.Tests.SampleInterfaces;
 using NDeepSubrogate.Core.Tests.SampleInterfaces.Impl;
 
 namespace NDeepSubrogate.Core.Tests.SampleClasses
 {
-    public class Vehicle
+    public class Vehicle : IConveyance
     {
         private ICalculator _calculator;
 
         public Vehicle()
         {
             SpeedInKph = 0;
-            Color = ConsoleColor.Blue;
         }
 
         public void Accelerate(int speed)
@@ -49,8 +47,6 @@ namespace NDeepSubrogate.Core.Tests.SampleClasses
         {
             SpeedInKph = 0;
         }
-
-        public ConsoleColor Color { get; set; }
 
         public int SpeedInKph { get; private set; }
 

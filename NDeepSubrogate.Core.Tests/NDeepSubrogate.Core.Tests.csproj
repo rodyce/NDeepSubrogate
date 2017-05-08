@@ -48,8 +48,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SampleClasses\Airplane.cs" />
     <Compile Include="SampleClasses\Vehicle.cs" />
+    <Compile Include="SampleInterfaces\IAirplane.cs" />
     <Compile Include="SampleInterfaces\ICalculator.cs" />
+    <Compile Include="SampleInterfaces\IConveyance.cs" />
     <Compile Include="SampleInterfaces\Impl\Calculator.cs" />
     <Compile Include="SubrogationTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

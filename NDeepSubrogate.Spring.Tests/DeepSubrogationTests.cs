@@ -63,7 +63,7 @@ namespace NDeepSubrogate.Spring.Tests
         }
 
         [Test]
-        public void RestoreTest()
+        public void SubrogateAndRestoreContextTest()
         {
             var subrogateScope = new SpringDeepSurrogateScope(this,
                 (AbstractApplicationContext)applicationContext);
@@ -80,7 +80,7 @@ namespace NDeepSubrogate.Spring.Tests
         }
 
         [Test]
-        public void DeepSubrogateTest()
+        public void SubrogateObjectInConcreteClassInstanceFieldTest()
         {
             var subrogateScope = new SpringDeepSurrogateScope(this,
                 (AbstractApplicationContext)applicationContext);

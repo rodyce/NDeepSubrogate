@@ -18,8 +18,11 @@
 
 #endregion
 
- 
- using NDeepSubrogate.Core.Attributes;
+using System;
+using FakeItEasy;
+using FakeItEasy.Sdk;
+using NDeepSubrogate.Core.Attributes;
+using NDeepSubrogate.Core.Tests.SampleInterfaces;
 using NDeepSubrogate.Spring.Tests.ServiceImpl;
 using NUnit.Framework;
 using Spring.Context.Support;
@@ -38,31 +41,78 @@ namespace NDeepSubrogate.Spring.Tests
 
         protected override string[] ConfigLocations { get; }
 
-        [Subrogate]
+        [Subrogate(Spy = true)]
+        [Autowired]
+        private readonly ICalculator _calculator = null;
+
         [Autowired]
         private readonly SpringVehicle _vehicle = null;
 
-        [Test]
-        public void ServicesAreInjected()
-        {
-            Assert.IsNotNull(_vehicle);
-        }
+        [Subrogate(Spy = true)]
+        [Autowired]
+        private readonly SpringAirplane _airplane = null;
 
         [Test]
-        public void RestoreTest()
+        public void SpiesAreApplied()
         {
             var subrogateScope = new SpringDeepSurrogateScope(this,
                 (AbstractApplicationContext)applicationContext);
 
-            var oldVehicle = _vehicle;
+            subrogateScope.DeepSubrogate();
+
+            Assert.AreEqual(13, _calculator.Add(7, 6));
+            A.CallTo(() => _calculator.Add(A<double>._, A<double>._))
+                .MustHaveHappened(Repeated.Exactly.Once);
+            Assert.IsNotNull(_vehicle);
+
+            subrogateScope.DeepRestore();
+        }
+
+        [Test]
+        public void SubrogateAndRestoreContextTest()
+        {
+            var subrogateScope = new SpringDeepSurrogateScope(this,
+                (AbstractApplicationContext)applicationContext);
+
+            var oldCalculator = _calculator;
+            var oldAirplane = _airplane;
 
             subrogateScope.DeepSubrogate();
 
-            Assert.AreNotSame(oldVehicle.GetType(), _vehicle.GetType());
+            Assert.AreNotSame(oldCalculator.GetType(), _calculator.GetType());
+            Assert.AreNotSame(oldAirplane.GetType(), _airplane.GetType());
 
             subrogateScope.DeepRestore();
 
-            Assert.AreSame(oldVehicle.GetType(), _vehicle.GetType());
+            Assert.AreSame(oldCalculator.GetType(), _calculator.GetType());
+            Assert.AreSame(oldAirplane.GetType(), _airplane.GetType());
+        }
+
+        [Test]
+        public void SpySurrogateTest()
+        {
+            var subrogateScope = new SpringDeepSurrogateScope(this,
+                (AbstractApplicationContext)applicationContext);
+            try
+            {
+                subrogateScope.DeepSubrogate();
+
+                _vehicle.Accelerate(50);
+                _vehicle.Accelerate(150);
+
+                _airplane.Accelerate(500);
+                _airplane.Accelerate(1500);
+
+                Assert.AreEqual(200.0, _vehicle.SpeedInKph);
+                Assert.AreEqual(2000.0, _airplane.SpeedInKph);
+                A.CallTo(() => _calculator.Add(A<double>._, A<double>._))
+                    .MustHaveHappened(Repeated.Exactly.Times(4));
+
+            }
+            finally
+            {
+                subrogateScope.DeepRestore();
+            }
         }
     }
 }

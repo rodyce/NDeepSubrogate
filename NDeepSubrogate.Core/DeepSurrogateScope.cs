@@ -37,10 +37,12 @@ namespace NDeepSubrogate.Core
             _initialObject = initialObject;
             _fieldsToRestoreDictionary = new Dictionary<Type, ISet<FieldInfo>>();
             _processedObjects = new HashSet<object>();
-            TypesToSubrogateSet = DetermineTypesToSubrogate();
+            DetermineTypesToSubrogate();
         }
 
-        public ISet<Type> TypesToSubrogateSet { get; }
+        public ISet<Type> TypesToSubrogateSet { get; private set; }
+
+        public ISet<Type> TypesToSpySubrogateSet { get; private set; }
 
         public virtual void DeepSubrogate()
         {
@@ -59,7 +61,7 @@ namespace NDeepSubrogate.Core
             var fieldSet = GetAllFieldsFromType(workingType);
             foreach (var field in fieldSet)
             {
-                if (IsFieldToBeSubstituted(field))
+                if (IsFieldToBeSubrogated(field))
                 {
                     //Register the current field and its owner type to be restored
                     RegisterFieldToRestore(workingType, field);
@@ -68,7 +70,7 @@ namespace NDeepSubrogate.Core
 
                     field.SetValue(currentObject, surrogateObject);
                 }
-                else if (IsFieldToBeExplored(field))
+                if (IsFieldToBeExplored(field))
                 {
                     var obj = GetObjectFromField(field, currentObject);
                     DeepSubrogateReferences(obj);
@@ -103,14 +105,19 @@ namespace NDeepSubrogate.Core
             return allFields;
         }
 
-        protected virtual bool IsFieldToBeSubstituted(FieldInfo field)
+        protected virtual bool IsFieldToBeSubrogated(FieldInfo field)
         {
             return TypesToSubrogateSet.Contains(field.FieldType);
         }
 
+        protected virtual bool IsFieldToBeSpySubrogated(FieldInfo field)
+        {
+            return TypesToSpySubrogateSet.Contains(field.FieldType);
+        }
+
         protected virtual bool IsFieldToBeExplored(FieldInfo field)
         {
-            return !IsFieldToBeSubstituted(field);
+            return !IsFieldToBeSubrogated(field);
         }
 
         private void RegisterFieldToRestore(Type type, FieldInfo field)
@@ -139,25 +146,32 @@ namespace NDeepSubrogate.Core
             return attr == null || attr.Enabled;
         }
 
-        protected ISet<Type> DetermineTypesToSubrogate()
+        private void DetermineTypesToSubrogate()
         {
-            var typesToSubrogate = new HashSet<Type>();
             var workingType = _initialObject.GetType();
             if (!IsSubrogationEnabledForType(workingType))
             {
-                return typesToSubrogate;
+                return;
             }
+
+            TypesToSubrogateSet = new HashSet<Type>();
+            TypesToSpySubrogateSet = new HashSet<Type>();
 
             var fieldSet = GetAllFieldsFromType(workingType);
             foreach (var field in fieldSet)
             {
-                if (field.GetCustomAttribute<SubrogateAttribute>() != null)
+                var subrogateAttr = field.GetCustomAttribute<SubrogateAttribute>();
+                if (subrogateAttr == null)
                 {
-                    typesToSubrogate.Add(field.FieldType);
+                    continue;
+                }
+
+                TypesToSubrogateSet.Add(field.FieldType);
+                if (subrogateAttr.Spy)
+                {
+                    TypesToSpySubrogateSet.Add(field.FieldType);
                 }
             }
-
-            return typesToSubrogate;
         }
 
         protected abstract object GetObjectFromType(Type type);

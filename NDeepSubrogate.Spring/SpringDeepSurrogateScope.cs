@@ -72,12 +72,28 @@ namespace NDeepSubrogate.Spring
                 return;
             }
 
-            var objectNameList = GetAppContextObjectNameListFromType(type);
+            IObjectDefinition objectDefinition;
 
-            var objectDefinition = ObjectDefinitionBuilder.GenericObjectDefinition(
-                typeof(SurrogateFactoryObject))
-                .AddPropertyValue("TargetObjectType", type)
-                .ObjectDefinition;
+            if (!TypesToSpySubrogateSet.Contains(type))
+            {
+                objectDefinition = ObjectDefinitionBuilder.GenericObjectDefinition(
+                    typeof(SurrogateFactoryObject))
+                    .AddPropertyValue("SurrogateType", SurrogateType.Mock)
+                    .AddPropertyValue("TargetObjectType", type)
+                    .ObjectDefinition;
+            }
+            else
+            {
+                var objectToSpy = GetTargetObject(GetObjectFromType(type));
+                objectDefinition = ObjectDefinitionBuilder.GenericObjectDefinition(
+                    typeof(SurrogateFactoryObject))
+                    .AddPropertyValue("SurrogateType", SurrogateType.Spy)
+                    .AddPropertyValue("TargetObjectType", type)
+                    .AddPropertyValue("ObjectToFake", objectToSpy)
+                    .ObjectDefinition;
+            }
+
+            var objectNameList = GetAppContextObjectNameListFromType(type);
 
             var nameList = objectNameList as string[] ?? objectNameList.ToArray();
             var objectDefinitionName = nameList.Count() == 1 ? nameList.First() : type.FullName;
@@ -112,27 +128,52 @@ namespace NDeepSubrogate.Spring
         protected override object GetObjectFromField(FieldInfo fieldInfo, object o)
         {
             var target = fieldInfo.GetValue(o);
+            if (TypesToSpySubrogateSet.Contains(fieldInfo.FieldType))
+            {
+                var names = GetAppContextObjectNameListFromType(fieldInfo.FieldType);
+                if (names.Any())
+                {
+                    var factoryObjectName = $"&{names.First()}";
+                    var spyObjectDef = _applicationContext.GetObject(factoryObjectName);
+                    if (spyObjectDef is SurrogateFactoryObject)
+                    {
+                        target = (spyObjectDef as SurrogateFactoryObject).ObjectToFake;
+                    }
+                }
+            }
+            while (AopUtils.IsAopProxy(target))
+            {
+                target = ((IAdvised) target).TargetSource.GetTarget();
+            }
+            return target;
+        }
+
+        private static object GetTargetObject(object o)
+        {
+            var target = o;
             return AopUtils.IsAopProxy(target) ?
-                ((IAdvised) target).TargetSource.GetTarget() :
+                ((IAdvised)target).TargetSource.GetTarget() :
                 target;
         }
 
         protected override bool IsFieldToBeExplored(FieldInfo field)
         {
-            //TODO consider fields that contains existent Object Definition in the application
-            //context. i.e.:
-            //_applicationContext.ContainsObject(GetComponentNameFromField(field));
-            //Examine fields with the [Autowired] attribute and without the [Subrogate] attribute
-            //TODO Consider partial mocks
+            //Examine fields with the [Autowired] attribute or spy surrogates
+            //TODO Consider objects injected through the constructor or through a setter
+            var subrogateAttr = field.GetCustomAttribute<SubrogateAttribute>();
             return field.GetCustomAttribute<AutowiredAttribute>() != null &&
-                   field.GetCustomAttribute<SubrogateAttribute>() == null;
+                    IsObjectByTypeInUse(field.FieldType) &&
+                    (subrogateAttr == null || subrogateAttr.Spy);
         }
 
+        /*
+         * The following logic will be used when supporting Spring.NET [Qualifier] attribute:
         private static string GetComponentNameFromField(FieldInfo field)
         {
             var qualifierAttribute = field.GetCustomAttribute<QualifierAttribute>();
             return qualifierAttribute != null ? qualifierAttribute.Value : field.FieldType.FullName;
         }
+        */
 
         private void RestoreAppContext()
         {
@@ -140,6 +181,11 @@ namespace NDeepSubrogate.Spring
             {
                 _applicationContext.ReplaceObjectDefinition(entry.Key, entry.Value);
             }
+        }
+
+        private bool IsObjectByTypeInUse(Type type)
+        {
+            return GetAppContextObjectNameListFromType(type).Any();
         }
 
         private IEnumerable<string> GetAppContextObjectNameListFromType(Type type)
