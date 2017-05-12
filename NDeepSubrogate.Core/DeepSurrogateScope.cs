@@ -148,14 +148,16 @@ namespace NDeepSubrogate.Core
 
         private void DetermineTypesToSubrogate()
         {
+            //The TypesToSubrogateSet and TypesToSpySubrogateSet properties may not be null.
+            //If there is nothing to subrogate, then these are empty sets.
+            TypesToSubrogateSet = new HashSet<Type>();
+            TypesToSpySubrogateSet = new HashSet<Type>();
+
             var workingType = _initialObject.GetType();
             if (!IsSubrogationEnabledForType(workingType))
             {
                 return;
             }
-
-            TypesToSubrogateSet = new HashSet<Type>();
-            TypesToSpySubrogateSet = new HashSet<Type>();
 
             var fieldSet = GetAllFieldsFromType(workingType);
             foreach (var field in fieldSet)

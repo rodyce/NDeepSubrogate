@@ -82,9 +82,8 @@ namespace NDeepSubrogate.Core.Tests
         [Test]
         public void SubrogationDisabledTest()
         {
-            //Since only the _calculator field, of type ICalculator, has the Subrogate attribute then
-            //only the type ICalculator must be subrogated.
-
+            //Since the DummySubrogationDisabled class has the [DeepSubrogate] attribute with the
+            //Enabled flag set to false, then the scope's TypesToSubrogateSet must be empty.
             var dummy = new DummySubrogationDisabled();
 
             Func<Type, object> dummyFunc = type => null;

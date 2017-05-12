@@ -56,6 +56,13 @@ namespace NDeepSubrogate.Spring.Tests
         [Test]
         public void BeforeSubrogateTest()
         {
+            // This is to remind that singletons may have state. Such state is kept
+            // across different test executions.
+            if (_vehicle.SpeedInKph > 0)
+            {
+                _vehicle.Stop();
+            }
+
             _vehicle.Accelerate(10);
             _vehicle.Accelerate(30);
 

@@ -18,9 +18,7 @@
 
 #endregion
 
-using System;
 using FakeItEasy;
-using FakeItEasy.Sdk;
 using NDeepSubrogate.Core.Attributes;
 using NDeepSubrogate.Core.Tests.SampleInterfaces;
 using NDeepSubrogate.Spring.Tests.ServiceImpl;
@@ -107,7 +105,6 @@ namespace NDeepSubrogate.Spring.Tests
                 Assert.AreEqual(2000.0, _airplane.SpeedInKph);
                 A.CallTo(() => _calculator.Add(A<double>._, A<double>._))
                     .MustHaveHappened(Repeated.Exactly.Times(4));
-
             }
             finally
             {

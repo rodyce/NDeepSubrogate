@@ -181,6 +181,7 @@ namespace NDeepSubrogate.Spring
             {
                 _applicationContext.ReplaceObjectDefinition(entry.Key, entry.Value);
             }
+            _originalObjectDefinitionsDictionary.Clear();
         }
 
         private bool IsObjectByTypeInUse(Type type)
