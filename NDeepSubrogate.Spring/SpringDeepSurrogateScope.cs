@@ -133,8 +133,9 @@ namespace NDeepSubrogate.Spring
                 var names = GetAppContextObjectNameListFromType(fieldInfo.FieldType);
                 if (names.Any())
                 {
-                    var factoryObjectName = $"&{names.First()}";
-                    var spyObjectDef = _applicationContext.GetObject(factoryObjectName);
+                    // TODO: Deal with the case that there are several names. Using always the First
+                    // may not be okay in all cases.
+                    var spyObjectDef = _applicationContext.GetFactoryObject(names.First());
                     if (spyObjectDef is SurrogateFactoryObject)
                     {
                         target = (spyObjectDef as SurrogateFactoryObject).ObjectToFake;

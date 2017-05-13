@@ -22,6 +22,7 @@
 using System;
 using System.Reflection;
 using Spring.Context.Support;
+using Spring.Objects.Factory;
 using Spring.Objects.Factory.Config;
 
 namespace NDeepSubrogate.Spring
@@ -36,9 +37,31 @@ namespace NDeepSubrogate.Spring
                     objectFactory, new object[] { name });
         }
 
+        public static IFactoryObject GetFactoryObject(this AbstractApplicationContext applicationContext, string name)
+        {
+            // In Spring.NET the factory object itself of an object can be retrieved by prefixing its name
+            // with an ampersand "&".
+            var factoryObjectName = $"&{name}";
+            return (IFactoryObject) applicationContext.GetObject(factoryObjectName);
+        }
+
         public static void ReplaceObjectDefinition(this AbstractApplicationContext applicationContext, string name,
             IObjectDefinition definition)
         {
+            if (definition?.ObjectType != typeof(SurrogateFactoryObject))
+            {
+                // Proceed here if the object definition will replace the object definition of the
+                // SurrogateFactoryObject type.
+                var factoryObject = applicationContext.GetFactoryObject(name);
+                if (factoryObject is SurrogateFactoryObject && factoryObject.IsSingleton)
+                {
+                    // If it happens that Sprint.NET decides to cache this factory object's singleton object, then
+                    // proceed to clear its state, like call counters, so a new test starts with a clean
+                    // mock/spy surrogate.
+                    var fakeObject = factoryObject.GetObject();
+                    FakeItEasy.Fake.ClearRecordedCalls(fakeObject);
+                }
+            }
             applicationContext.ObjectFactory.RemoveSingleton(name);
             applicationContext.RegisterObjectDefinition(name, definition);
         }
