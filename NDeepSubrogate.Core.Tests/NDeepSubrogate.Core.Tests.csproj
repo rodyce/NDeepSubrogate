@@ -48,6 +48,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SurrogateTypesDeterminationTests.cs" />
+    <Compile Include="TestUtils\DummyTestClasses.cs" />
     <Compile Include="SampleClasses\Airplane.cs" />
     <Compile Include="SampleClasses\Vehicle.cs" />
     <Compile Include="SampleInterfaces\IAirplane.cs" />
@@ -56,7 +58,7 @@
     <Compile Include="SampleInterfaces\Impl\Calculator.cs" />
     <Compile Include="SubrogationTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestableDeepSurrogateScope.cs" />
+    <Compile Include="TestUtils\TestableDeepSurrogateScope.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

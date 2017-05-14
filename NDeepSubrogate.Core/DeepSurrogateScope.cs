@@ -49,6 +49,40 @@ namespace NDeepSubrogate.Core
             DeepSubrogateReferences(_initialObject);
         }
 
+        public virtual void DeepRestore()
+        {
+            ForEachFieldToRestore((type, fieldInfo) =>
+            {
+                var instance = type == _initialObject.GetType() ? _initialObject : GetObjectFromType(type);
+
+                if (instance != null)
+                {
+                    fieldInfo.SetValue(instance, GetObjectFromType(fieldInfo.FieldType));
+                }
+            });
+        }
+
+        public virtual void Execute(Action action)
+        {
+            try
+            {
+                // Deeply subrogate the scope
+                DeepSubrogate();
+
+                // Invoke the user supplied action within the subrogation scope.
+                action();
+            }
+            finally
+            {
+                // Just rethrow any exception as a result of any exception in .
+                // Restore the scope that was subrogated previously. Any thrown exception within
+                // the user-supplied action invocation will just get rethrown. If an exception
+                // was thrown as a consequence of invoking the DeepSubrogate() call, any partial
+                // subrogation will be restored here.
+                DeepRestore();
+            }
+        }
+
         private void DeepSubrogateReferences(object currentObject)
         {
             if (currentObject == null ||_processedObjects.Contains(currentObject) ||
@@ -76,19 +110,6 @@ namespace NDeepSubrogate.Core
                     DeepSubrogateReferences(obj);
                 }
             }
-        }
-
-        public virtual void DeepRestore()
-        {
-            ForEachFieldToRestore((type, fieldInfo) =>
-            {
-                var instance = type == _initialObject.GetType() ? _initialObject : GetObjectFromType(type);
-
-                if (instance != null)
-                {
-                    fieldInfo.SetValue(instance, GetObjectFromType(fieldInfo.FieldType));
-                }
-            });
         }
 
 

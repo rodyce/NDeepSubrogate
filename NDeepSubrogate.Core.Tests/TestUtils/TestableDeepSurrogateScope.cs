@@ -21,7 +21,7 @@
 
 using System;
 
-namespace NDeepSubrogate.Core.Tests
+namespace NDeepSubrogate.Core.Tests.TestUtils
 {
     internal class TestableDeepSurrogateScope : DeepSurrogateScope
     {

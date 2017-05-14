@@ -32,6 +32,6 @@ namespace NDeepSubrogate.Spring.Tests.ServiceImpl
         [Autowired]
         private readonly ICalculator _calculator = null;
 
-        protected override ICalculator Calculator => _calculator;
+        public override ICalculator Calculator => _calculator;
     }
 }

@@ -50,6 +50,6 @@ namespace NDeepSubrogate.Core.Tests.SampleClasses
 
         public int SpeedInKph { get; private set; }
 
-        protected virtual ICalculator Calculator => _calculator ?? (_calculator = new Calculator());
+        public virtual ICalculator Calculator => _calculator ?? (_calculator = new Calculator());
     }
 }
