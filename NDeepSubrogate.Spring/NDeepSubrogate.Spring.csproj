@@ -72,11 +72,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DeepSubrogateObjectFactory.cs" />
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="SpringDeepSurrogateScope.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SurrogateFactoryObject.cs" />
+    <Compile Include="Testing\NUnit\SubrogationEnabledDependencyInjectionSpringContextTests.cs" />
+    <Compile Include="Testing\NUnit\SubrogationEnabledSpringContextTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

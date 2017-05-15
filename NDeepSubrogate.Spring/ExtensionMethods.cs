@@ -18,9 +18,10 @@
 
 #endregion
 
- 
+
 using System;
 using System.Reflection;
+using Spring.Context;
 using Spring.Context.Support;
 using Spring.Objects.Factory;
 using Spring.Objects.Factory.Config;
@@ -37,7 +38,7 @@ namespace NDeepSubrogate.Spring
                     objectFactory, new object[] { name });
         }
 
-        public static IFactoryObject GetFactoryObject(this AbstractApplicationContext applicationContext, string name)
+        public static IFactoryObject GetFactoryObject(this IConfigurableApplicationContext applicationContext, string name)
         {
             // In Spring.NET the factory object itself of an object can be retrieved by prefixing its name
             // with an ampersand "&".
@@ -45,7 +46,35 @@ namespace NDeepSubrogate.Spring
             return (IFactoryObject) applicationContext.GetObject(factoryObjectName);
         }
 
-        public static void ReplaceObjectDefinition(this AbstractApplicationContext applicationContext, string name,
+        public static IObjectDefinition GetObjectDefinition(this IConfigurableApplicationContext applicationContext,
+            string name)
+        {
+            try
+            {
+                return ((AbstractApplicationContext)applicationContext).GetObjectDefinition(name);
+
+            }
+            catch (InvalidCastException e)
+            {
+                throw new InvalidOperationException($"Cannot register object definition with name: {name}", e);
+            }
+        }
+
+        public static void RegisterObjectDefinition(this IConfigurableApplicationContext applicationContext,
+            string name, IObjectDefinition definition)
+        {
+            try
+            {
+                ((AbstractApplicationContext)applicationContext).RegisterObjectDefinition(name, definition);
+
+            }
+            catch (InvalidCastException e)
+            {
+                throw new InvalidOperationException($"Cannot register object definition with name: {name}", e);
+            }
+        }
+
+        public static void ReplaceObjectDefinition(this IConfigurableApplicationContext applicationContext, string name,
             IObjectDefinition definition)
         {
             if (definition?.ObjectType != typeof(SurrogateFactoryObject))

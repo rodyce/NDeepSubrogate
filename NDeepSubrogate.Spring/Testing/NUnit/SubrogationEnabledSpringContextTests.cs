@@ -19,21 +19,30 @@
 #endregion
 
 
-using Spring.Objects.Factory;
-using Spring.Objects.Factory.Support;
+using NUnit.Framework;
+using Spring.Testing.NUnit;
 
-namespace NDeepSubrogate.Spring
+namespace NDeepSubrogate.Spring.Testing.NUnit
 {
-    class DeepSubrogateObjectFactory : DefaultListableObjectFactory
+    public abstract class SubrogationEnabledSpringContextTests : AbstractTransactionalSpringContextTests
     {
-        public DeepSubrogateObjectFactory(bool caseSensitive, IObjectFactory parentFactory)
-            : base(caseSensitive, parentFactory)
+        private SpringDeepSurrogateScope _surrogateScope;
+
+        [SetUp]
+        protected void DoSubrogateContext()
         {
+            if (_surrogateScope == null)
+            {
+                var appContext = GetContext(ContextKey);
+                _surrogateScope = new SpringDeepSurrogateScope(this, appContext);
+            }
+            _surrogateScope.DeepSubrogate();
         }
 
-        public new void RemoveSingleton(string name)
+        [TearDown]
+        protected void DoRestoreContext()
         {
-            base.RemoveSingleton(name);
+            _surrogateScope?.DeepRestore();
         }
     }
 }

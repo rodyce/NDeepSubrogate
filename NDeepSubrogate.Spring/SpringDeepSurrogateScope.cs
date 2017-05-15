@@ -26,7 +26,7 @@ using System.Reflection;
 using NDeepSubrogate.Core;
 using NDeepSubrogate.Core.Attributes;
 using Spring.Aop.Framework;
-using Spring.Context.Support;
+using Spring.Context;
 using Spring.Objects.Factory.Attributes;
 using Spring.Objects.Factory.Config;
 using Spring.Objects.Factory.Support;
@@ -35,11 +35,11 @@ namespace NDeepSubrogate.Spring
 {
     public class SpringDeepSurrogateScope : DeepSurrogateScope
     {
-        private readonly AbstractApplicationContext _applicationContext;
+        private readonly IConfigurableApplicationContext _applicationContext;
         private readonly IDictionary<string, IObjectDefinition> _originalObjectDefinitionsDictionary;
 
         public SpringDeepSurrogateScope(object initialObject,
-            AbstractApplicationContext applicationContext) : base(initialObject)
+            IConfigurableApplicationContext applicationContext) : base(initialObject)
         {
             _applicationContext = applicationContext;
             _originalObjectDefinitionsDictionary = new Dictionary<string, IObjectDefinition>();
