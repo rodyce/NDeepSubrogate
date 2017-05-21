@@ -53,7 +53,7 @@ namespace NDeepSubrogate.Spring.Tests
         [Test]
         public void SpiesAreApplied()
         {
-            var subrogateScope = new SpringDeepSurrogateScope(this,
+            var subrogateScope = new SpringDeepSubrogationScope(this,
                 (AbstractApplicationContext)applicationContext);
 
             subrogateScope.DeepSubrogate();
@@ -69,7 +69,7 @@ namespace NDeepSubrogate.Spring.Tests
         [Test]
         public void SubrogateAndRestoreContextTest()
         {
-            var subrogateScope = new SpringDeepSurrogateScope(this,
+            var subrogateScope = new SpringDeepSubrogationScope(this,
                 (AbstractApplicationContext)applicationContext);
 
             var oldCalculator = _calculator;
@@ -89,7 +89,7 @@ namespace NDeepSubrogate.Spring.Tests
         [Test]
         public void SpySurrogateTest()
         {
-            var subrogateScope = new SpringDeepSurrogateScope(this,
+            var subrogateScope = new SpringDeepSubrogationScope(this,
                 (AbstractApplicationContext)applicationContext);
             try
             {

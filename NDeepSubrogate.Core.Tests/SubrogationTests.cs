@@ -71,7 +71,7 @@ namespace NDeepSubrogate.Core.Tests
 
             // Instantiate a new subrogation scope with the previous dummy object as the
             // scope's initial object
-            var surrogateScope = new TestableDeepSurrogateScope(dummy, GetSurrogateFromType,
+            var surrogateScope = new TestableDeepSubrogationScope(dummy, GetSurrogateFromType,
                 GetObjectFromType);
 
             // Add the original referenced objects by dummy to be restored later
@@ -106,7 +106,7 @@ namespace NDeepSubrogate.Core.Tests
 
             // Instantiate a new subrogation scope with the previous dummy object as the
             // scope's initial object
-            var surrogateScope = new TestableDeepSurrogateScope(dummy, GetSurrogateFromType,
+            var surrogateScope = new TestableDeepSubrogationScope(dummy, GetSurrogateFromType,
                 GetObjectFromType);
 
             // Add the original referenced objects by dummy to be restored later
@@ -146,7 +146,7 @@ namespace NDeepSubrogate.Core.Tests
 
             // Instantiate a new subrogation scope with the previous dummy object as the
             // scope's initial object
-            var surrogateScope = new TestableDeepSurrogateScope(dummy, GetSurrogateFromType,
+            var surrogateScope = new TestableDeepSubrogationScope(dummy, GetSurrogateFromType,
                 GetObjectFromType);
 
             // Add the original referenced objects by dummy to be restored later

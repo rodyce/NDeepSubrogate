@@ -23,12 +23,12 @@ using System;
 
 namespace NDeepSubrogate.Core.Tests.TestUtils
 {
-    internal class TestableDeepSurrogateScope : DeepSurrogateScope
+    internal class TestableDeepSubrogationScope : DeepSubrogationScope
     {
         private readonly Func<Type, object> _surrogateObjectsFunc;
         private readonly Func<Type, object> _originalObjectsFunc;
 
-        public TestableDeepSurrogateScope(object initialObject,
+        public TestableDeepSubrogationScope(object initialObject,
             Func<Type, object> surrogateObjectsFunc,
             Func<Type, object> originalObjectsFunc) : base(initialObject)
         {

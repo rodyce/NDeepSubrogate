@@ -26,32 +26,32 @@ namespace NDeepSubrogate.Spring.Testing.NUnit
 {
     public abstract class SubrogationEnabledTransactionalSpringContextTests : AbstractTransactionalSpringContextTests
     {
-        private SpringDeepSurrogateScope _surrogateScope;
+        private SpringDeepSubrogationScope _subrogationScope;
 
         [TestFixtureSetUp]
         protected void SubrogationInit()
         {
             var appContext = GetContext(ContextKey);
-            _surrogateScope = new SpringDeepSurrogateScope(this, appContext);
+            _subrogationScope = new SpringDeepSubrogationScope(this, appContext);
         }
 
         [SetUp]
         protected void DoSubrogateContext()
         {
-            Assert.NotNull(_surrogateScope);
-            _surrogateScope.DeepSubrogate();
+            Assert.NotNull(_subrogationScope);
+            _subrogationScope.DeepSubrogate();
         }
 
         [TearDown]
         protected void DoRestoreContext()
         {
-            _surrogateScope?.DeepRestore();
+            _subrogationScope?.DeepRestore();
         }
 
         [TestFixtureTearDown]
         protected void SubrogationCleanup()
         {
-            _surrogateScope = null;
+            _subrogationScope = null;
         }
     }
 }

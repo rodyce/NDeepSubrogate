@@ -33,12 +33,12 @@ using Spring.Objects.Factory.Support;
 
 namespace NDeepSubrogate.Spring
 {
-    public class SpringDeepSurrogateScope : DeepSurrogateScope
+    public class SpringDeepSubrogationScope : DeepSubrogationScope
     {
         private readonly IConfigurableApplicationContext _applicationContext;
         private readonly IDictionary<string, IObjectDefinition> _originalObjectDefinitionsDictionary;
 
-        public SpringDeepSurrogateScope(object initialObject,
+        public SpringDeepSubrogationScope(object initialObject,
             IConfigurableApplicationContext applicationContext) : base(initialObject)
         {
             _applicationContext = applicationContext;

@@ -36,7 +36,7 @@ namespace NDeepSubrogate.Core.Tests
         {
             var dummy = new DummyOneSurrogate();
 
-            var surrogateScope = new TestableDeepSurrogateScope(dummy, type => null, type => null);
+            var surrogateScope = new TestableDeepSubrogationScope(dummy, type => null, type => null);
 
             // Since only the _calculator field (ICalculator type), has the SubrogateAttribute then
             // only the ICalculator type fields must be subrogated.
@@ -51,7 +51,7 @@ namespace NDeepSubrogate.Core.Tests
         {
             var dummy = new DummyTwoSurrogates();
 
-            var surrogateScope = new TestableDeepSurrogateScope(dummy, type => null, type => null);
+            var surrogateScope = new TestableDeepSubrogationScope(dummy, type => null, type => null);
 
             // Since both the _calculator field (ICalculator), and the _vehicle field (Vehicle)
             // have the SubrogateAttribute then both fields must be subrogated.
@@ -66,7 +66,7 @@ namespace NDeepSubrogate.Core.Tests
         {
             var dummy = new DummyNoSurrogate();
 
-            var surrogateScope = new TestableDeepSurrogateScope(dummy, type => null, type => null);
+            var surrogateScope = new TestableDeepSubrogationScope(dummy, type => null, type => null);
 
             // Since none of the fields have the SubrogateAttribute, then nothing must be subrogated.
             var expectedSet = new HashSet<Type>();
@@ -80,7 +80,7 @@ namespace NDeepSubrogate.Core.Tests
         {
             var dummy = new DummySubrogationDisabled();
 
-            var surrogateScope = new TestableDeepSurrogateScope(dummy, type => null, type => null);
+            var surrogateScope = new TestableDeepSubrogationScope(dummy, type => null, type => null);
 
             // Since the DummySubrogationDisabled class has the [DeepSubrogate] attribute with the
             // Enabled flag set to false, then the scope's TypesToSubrogateSet must be empty.

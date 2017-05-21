@@ -73,7 +73,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ExtensionMethods.cs" />
-    <Compile Include="SpringDeepSurrogateScope.cs" />
+    <Compile Include="SpringDeepSubrogationScope.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SurrogateFactoryObject.cs" />
     <Compile Include="Testing\NUnit\SubrogationEnabledDependencyInjectionSpringContextTests.cs" />

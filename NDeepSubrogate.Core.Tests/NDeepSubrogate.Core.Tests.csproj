@@ -58,7 +58,7 @@
     <Compile Include="SampleInterfaces\Impl\Calculator.cs" />
     <Compile Include="SubrogationTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestUtils\TestableDeepSurrogateScope.cs" />
+    <Compile Include="TestUtils\TestableDeepSubrogationScope.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

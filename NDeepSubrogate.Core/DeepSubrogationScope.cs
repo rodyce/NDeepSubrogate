@@ -26,13 +26,13 @@ using NDeepSubrogate.Core.Attributes;
 
 namespace NDeepSubrogate.Core
 {
-    public abstract class DeepSurrogateScope
+    public abstract class DeepSubrogationScope
     {
         private readonly object _initialObject;
         private readonly IDictionary<Type, ISet<FieldInfo>> _fieldsToRestoreDictionary;
         private readonly ISet<object> _processedObjects;
 
-        protected DeepSurrogateScope(object initialObject)
+        protected DeepSubrogationScope(object initialObject)
         {
             _initialObject = initialObject;
             _fieldsToRestoreDictionary = new Dictionary<Type, ISet<FieldInfo>>();
@@ -110,6 +110,10 @@ namespace NDeepSubrogate.Core
 
                     field.SetValue(currentObject, surrogateObject);
                 }
+
+                // Note: Spy surrogates must be explored. Therefore, this condition
+                // here has to be evaluated even if the previous one happened to be
+                // evaluated as true.
                 if (IsFieldToBeExplored(field))
                 {
                     var obj = GetObjectFromField(field, currentObject);

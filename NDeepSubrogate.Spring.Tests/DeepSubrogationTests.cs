@@ -72,7 +72,7 @@ namespace NDeepSubrogate.Spring.Tests
         [Test]
         public void SubrogateAndRestoreContextTest()
         {
-            var subrogateScope = new SpringDeepSurrogateScope(this,
+            var subrogateScope = new SpringDeepSubrogationScope(this,
                 (AbstractApplicationContext)applicationContext);
 
             var oldCalculator = _dummyCalculator;
@@ -89,7 +89,7 @@ namespace NDeepSubrogate.Spring.Tests
         [Test]
         public void SubrogateObjectInConcreteClassInstanceFieldTest()
         {
-            var subrogateScope = new SpringDeepSurrogateScope(this,
+            var subrogateScope = new SpringDeepSubrogationScope(this,
                 (AbstractApplicationContext)applicationContext);
 
             // Subrogate the referenced objects as marked with the [Subrogate] annotation.
