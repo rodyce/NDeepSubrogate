@@ -20,6 +20,7 @@
 
 
 using NDeepSubrogate.Core.Attributes;
+using NUnit.Framework;
 using Spring.Testing.NUnit;
 
 namespace NDeepSubrogate.Spring.Testing.NUnit
@@ -27,5 +28,32 @@ namespace NDeepSubrogate.Spring.Testing.NUnit
     [DeepSubrogate]
     public abstract class SubrogationEnabledDependencyInjectionSpringContextTests : AbstractDependencyInjectionSpringContextTests
     {
+        private SpringDeepSurrogateScope _surrogateScope;
+
+        [TestFixtureSetUp]
+        protected void SubrogationInit()
+        {
+            var appContext = GetContext(ContextKey);
+            _surrogateScope = new SpringDeepSurrogateScope(this, appContext);
+        }
+
+        [SetUp]
+        protected void DoSubrogateContext()
+        {
+            Assert.NotNull(_surrogateScope);
+            _surrogateScope.DeepSubrogate();
+        }
+
+        [TearDown]
+        protected void DoRestoreContext()
+        {
+            _surrogateScope?.DeepRestore();
+        }
+
+        [TestFixtureTearDown]
+        protected void SubrogationCleanup()
+        {
+            _surrogateScope = null;
+        }
     }
 }

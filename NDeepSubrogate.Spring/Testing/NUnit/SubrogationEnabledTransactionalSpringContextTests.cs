@@ -24,18 +24,21 @@ using Spring.Testing.NUnit;
 
 namespace NDeepSubrogate.Spring.Testing.NUnit
 {
-    public abstract class SubrogationEnabledSpringContextTests : AbstractTransactionalSpringContextTests
+    public abstract class SubrogationEnabledTransactionalSpringContextTests : AbstractTransactionalSpringContextTests
     {
         private SpringDeepSurrogateScope _surrogateScope;
+
+        [TestFixtureSetUp]
+        protected void SubrogationInit()
+        {
+            var appContext = GetContext(ContextKey);
+            _surrogateScope = new SpringDeepSurrogateScope(this, appContext);
+        }
 
         [SetUp]
         protected void DoSubrogateContext()
         {
-            if (_surrogateScope == null)
-            {
-                var appContext = GetContext(ContextKey);
-                _surrogateScope = new SpringDeepSurrogateScope(this, appContext);
-            }
+            Assert.NotNull(_surrogateScope);
             _surrogateScope.DeepSubrogate();
         }
 
@@ -43,6 +46,12 @@ namespace NDeepSubrogate.Spring.Testing.NUnit
         protected void DoRestoreContext()
         {
             _surrogateScope?.DeepRestore();
+        }
+
+        [TestFixtureTearDown]
+        protected void SubrogationCleanup()
+        {
+            _surrogateScope = null;
         }
     }
 }

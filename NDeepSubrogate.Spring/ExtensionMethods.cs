@@ -84,10 +84,10 @@ namespace NDeepSubrogate.Spring
                 var factoryObject = applicationContext.GetFactoryObject(name);
                 if (factoryObject is SurrogateFactoryObject && factoryObject.IsSingleton)
                 {
-                    // If it happens that Sprint.NET decides to cache this factory object's singleton object, then
-                    // proceed to clear its state, like call counters, so a new test starts with a clean
-                    // mock/spy surrogate.
-                    var fakeObject = factoryObject.GetObject();
+                    // If it happens that Sprint.NET decides to cache this singleton object, then
+                    // proceed to clear its state, like call counters. This is to make sure that
+                    // a new test starts with a clean mock/spy surrogate.
+                    var fakeObject = applicationContext.GetObject(name);
                     FakeItEasy.Fake.ClearRecordedCalls(fakeObject);
                 }
             }

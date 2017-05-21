@@ -37,6 +37,7 @@ namespace NDeepSubrogate.Core
             _initialObject = initialObject;
             _fieldsToRestoreDictionary = new Dictionary<Type, ISet<FieldInfo>>();
             _processedObjects = new HashSet<object>();
+
             DetermineTypesToSubrogate();
         }
 
@@ -46,6 +47,9 @@ namespace NDeepSubrogate.Core
 
         public virtual void DeepSubrogate()
         {
+            _fieldsToRestoreDictionary.Clear();
+            _processedObjects.Clear();
+
             DeepSubrogateReferences(_initialObject);
         }
 
@@ -60,6 +64,8 @@ namespace NDeepSubrogate.Core
                     fieldInfo.SetValue(instance, GetObjectFromType(fieldInfo.FieldType));
                 }
             });
+            _fieldsToRestoreDictionary.Clear();
+            _processedObjects.Clear();
         }
 
         public virtual void Execute(Action action)
@@ -85,7 +91,7 @@ namespace NDeepSubrogate.Core
 
         private void DeepSubrogateReferences(object currentObject)
         {
-            if (currentObject == null ||_processedObjects.Contains(currentObject) ||
+            if (currentObject == null || _processedObjects.Contains(currentObject) ||
                 !IsSubrogationEnabledForType(currentObject.GetType()))
             {
                 return;
