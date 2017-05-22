@@ -57,11 +57,14 @@ namespace NDeepSubrogate.Core
         {
             ForEachFieldToRestore((type, fieldInfo) =>
             {
-                var instance = type == _initialObject.GetType() ? _initialObject : GetObjectFromType(type);
+                var objectToRestore =
+                    type == _initialObject.GetType() ?
+                    _initialObject :
+                    GetTargetObject(GetObjectFromType(type));
 
-                if (instance != null)
+                if (objectToRestore != null)
                 {
-                    fieldInfo.SetValue(instance, GetObjectFromType(fieldInfo.FieldType));
+                    fieldInfo.SetValue(objectToRestore, GetObjectFromType(fieldInfo.FieldType));
                 }
             });
             _fieldsToRestoreDictionary.Clear();
@@ -211,9 +214,14 @@ namespace NDeepSubrogate.Core
 
         protected abstract object GetSurrogateFromType(Type type);
 
-        protected virtual object GetObjectFromField(FieldInfo fieldInfo, object o)
+        protected virtual object GetTargetObject(object obj)
         {
-            return fieldInfo.GetValue(o);
+            return obj;
+        }
+
+        protected virtual object GetObjectFromField(FieldInfo fieldInfo, object obj)
+        {
+            return fieldInfo.GetValue(obj);
         }
     }
 }

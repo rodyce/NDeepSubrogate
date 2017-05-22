@@ -117,7 +117,9 @@ namespace NDeepSubrogate.Spring
         protected override object GetObjectFromType(Type type)
         {
             var objectNameList = GetAppContextObjectNameListFromType(type);
-            return _applicationContext.GetObject(objectNameList.First());
+            var nameList = objectNameList as IList<string> ?? objectNameList.ToList();
+            return _applicationContext.GetObject(
+                nameList.Count() == 1 ? nameList.First() : type.FullName);
         }
 
         protected override object GetSurrogateFromType(Type type)
@@ -149,9 +151,9 @@ namespace NDeepSubrogate.Spring
             return target;
         }
 
-        private static object GetTargetObject(object o)
+        protected override object GetTargetObject(object obj)
         {
-            var target = o;
+            var target = obj;
             return AopUtils.IsAopProxy(target) ?
                 ((IAdvised)target).TargetSource.GetTarget() :
                 target;
@@ -198,6 +200,7 @@ namespace NDeepSubrogate.Spring
                 throw new NotSupportedException("The case where there is more than one object for a single type is " +
                                                 "not yet supported");
             }
+
             return objectNameList;
         }
     }
